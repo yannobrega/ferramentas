@@ -1,0 +1,37 @@
+@echo off
+
+:inicio
+color 0F
+cls
+
+echo.
+
+::retirando o ">null" ele mostra os detalhes.
+	echo Digite o IP/Nome de destino.
+		set/p host=
+
+	echo Digite a quantidade de Pacotes que deseja enviar.
+		set/p count=
+
+	echo Digite o peso do pacote.
+		set/p size=
+
+Echo Testando...
+
+ping -a -l %size% -n %count% %host%
+
+if not errorlevel 1 goto ok
+
+echo.
+color 0c
+echo --= SEM CONECTIVIDADE COM A INTERNET =--
+pause
+goto inicio
+
+:ok
+color 02
+echo.
+echo --= CONECTIVIDADE COM A INTERNET = OK =--
+echo.
+pause
+goto inicio
