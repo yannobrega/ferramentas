@@ -1,0 +1,11 @@
+# BAIXE OS ARQUIVOS DO LINK
+# DESCOMPACTE-OS
+# COPIE E COLE EM WINDOWS > SYSTEM32
+
+# LINK DOS ARQUIVOS: https://drive.google.com/file/d/1B-bs0S39Tc-bu7525w3S443HZ1fAE1HX/view?usp=sharing
+
+@echo off
+
+speedtest
+
+pause
