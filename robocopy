@@ -1,0 +1,12 @@
+@echo off
+
+	echo Digite o caminho de origem.
+		set /p src= 
+
+	echo Digite o caminho de destino.
+		set /p dst= 
+		
+
+robocopy \\%src% \\%dst% /COPYALL
+
+pause
