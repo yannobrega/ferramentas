@@ -1,0 +1,8 @@
+@echo off
+
+Echo Mapeando impressora [NOME QUE VOCE QUISER]....
+
+rundll32 printui.dll PrintUIEntry /in /n \\caminho_da_impressora
+
+Echo Impressora mapeada!
+
