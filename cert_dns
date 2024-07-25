@@ -1,0 +1,5 @@
+# Executar o PowerShell como Administrador
+
+$file = "C:\Windows\Temp\LumiunCA.crt"
+(New-Object System.Net.WebClient).DownloadFile("https://ldns.io/LumiunCA.crt", $file)
+certutil -addstore -enterprise -f "Root" $file
