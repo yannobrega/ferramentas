@@ -1,0 +1,31 @@
+@echo off
+
+:inicio
+color 0F
+cls
+
+echo.
+
+::retirando o ">null" ele mostra os detalhes.
+	echo Digite o IP/Nome de destino.
+		set/p input=
+
+Echo Testando...
+
+ping -a -n 12 %input%
+
+if not errorlevel 1 goto ok
+
+echo.
+color 0c
+echo --= SEM CONECTIVIDADE COM A INTERNET =--
+pause
+goto inicio
+
+:ok
+color 02
+echo.
+echo --= CONECTIVIDADE COM A INTERNET = OK =--
+echo.
+pause
+goto inicio
