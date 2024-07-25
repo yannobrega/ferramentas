@@ -1,0 +1,27 @@
+@echo off
+
+:inicio
+color 0F
+cls
+
+echo.
+Echo Testando...
+
+::retirando o ">null" ele mostra os detalhes.
+ping -a -n 20 google.com.br
+
+if not errorlevel 1 goto ok
+
+echo.
+color 0c
+echo --= SEM CONECTIVIDADE COM A INTERNET =--
+pause
+goto inicio
+
+:ok
+color 02
+echo.
+echo --= CONECTIVIDADE COM A INTERNET = OK =--
+echo.
+pause
+goto inicio
