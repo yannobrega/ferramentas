@@ -1,0 +1,146 @@
+@echo off
+
+color 0F
+cls
+
+echo.
+
+::retirando o ">null" ele mostra os detalhes.
+	echo Digite IP Local da RB.
+		set/p iplocal=
+		
+	echo Digite a mascara do IP Local da RB - ex 24.
+		set/p mask=
+		
+	echo Digite o ip de Network da rede local.
+		set/p network=
+
+	echo Digite o Inicio do Pool da LAN.
+		set/p rangestart=
+
+	echo Digite o Fim do Pool da LAN.
+		set/p rangeend=
+
+	echo Digite a url do servidor da vpn.
+		set/p urlvpn=
+		
+	echo Digite a porta da VPN.
+		set/p portvpn=
+
+	echo Digite o usuario da VPN.
+		set/p uservpn=
+		
+	echo Digite a senha da VPN.
+		set/p senhavpn=
+		
+	echo Digite a porta do Winbox.
+		set/p wbport=
+		
+	echo Digite o nome da RB.
+		set/p identity=
+		
+	echo Digite o destinatario do backup por email.
+		set/p destinatarioemail=
+		
+	echo Digite o remetente do backup por email.
+		set/p fromemail=
+		
+	echo Digite o usuario do email.
+		set/p useremail=
+		
+	echo Digite a senha do email.
+		set/p psswemail=
+
+
+@echo /interface bridge add name=bridge-switch >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface ethernet set [ find default-name=ether1 ] >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface ethernet set [ find default-name=ether2 ] >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface ethernet set [ find default-name=ether3 ] >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface ethernet set [ find default-name=ether4 ] >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface ethernet set [ find default-name=ether5 ] >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface pppoe-client add allow=chap,mschap1,mschap2 comment="===== PPPPoE-Default" disabled=no interface=ether1 name=pppoe-default password=teste user=teste >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list add name=ISP >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list add name=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface lte apn set [ find default=yes ] ip-type=ipv4 use-network-apn=no >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface wireless security-profiles set [ find default=yes ] supplicant-identity=MikroTik >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip pool add name=pool_local ranges=%rangestart%-%rangeend% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip dhcp-server add address-pool=pool_local interface=bridge-switch lease-time=6h name=dhcp_local >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /port set 0 name=serial0 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface sstp-client add authentication=chap,mschap1,mschap2 connect-to=%urlvpn% disabled=no name=sstp-3c-tech password=%senhavpn% port=%portvpn% profile=default-encryption user=%uservpn% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface bridge port add bridge=bridge-switch ingress-filtering=no interface=ether2 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface bridge port add bridge=bridge-switch ingress-filtering=no interface=ether3 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface bridge port add bridge=bridge-switch ingress-filtering=no interface=ether4 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface bridge port add bridge=bridge-switch ingress-filtering=no interface=ether5 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip neighbor discovery-settings set discover-interface-list=!ISP >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ipv6 settings set disable-ipv6=yes max-neighbor-entries=8192 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list member add interface=ether1 list=ISP >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list member add interface=pppoe-default list=ISP >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list member add interface=ether2 list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list member add interface=ether3 list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list member add interface=ether4 list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list member add interface=ether5 list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface list member add interface=sstp-3c-tech list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /interface ovpn-server server set auth=sha1,md5 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip address add address=%iplocal%/%mask% comment="===== REDE LAN" interface=bridge-switch network=%network% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip cloud set ddns-enabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo ip dhcp-client add interface=ether1 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip dhcp-server network add address=%iplocal%/%mask% dns-server=8.8.8.8,8.8.4.4 gateway=%iplocal% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip dns set servers=8.8.8.8,8.8.4.4 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=%iplocal%/%mask% comment="===== LAN" list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=%iplocal%/%mask% comment="===== LOCAL" list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=172.17.17.0 comment="===== VPN-RJ" list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=10.0.0.0 comment="===== VPN-SP" list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=0.0.0.0/8 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=127.0.0.0/8 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=169.254.0.0/16 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=192.0.0.0/24 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=192.0.2.0/24 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=198.18.0.0/15 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=198.51.100.0/24 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=203.0.113.0/24 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=224.0.0.0/4 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=240.0.0.0/4 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=255.255.255.255 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=accept chain=input comment="===== ACEITA ESTABELECIDAS, RELACIONADAS E UNTRACKED" connection-state=established,related,untracked in-interface-list=ISP >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=accept chain=input comment="===== ACEITA ICMP 100S" limit=100,5:packet protocol=icmp >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=accept chain=input comment="===== ACEITA_WINBOX" dst-port=4044 protocol=tcp src-address-list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=add-src-to-address-list address-list=PORTSCAN address-list-timeout=1d chain=input comment="===== DETECTA PORTSCAN" protocol=tcp psd=21,3s,3,1 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=add-src-to-address-list address-list=PORTSCAN address-list-timeout=1d chain=input comment="===== DETECTA PORTSCAN" protocol=udp psd=21,3s,3,1 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=drop chain=input comment="===== DROP GERAL" in-interface-list=ISP >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=fasttrack-connection chain=forward connection-state=established,related hw-offload=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall filter add action=accept chain=forward connection-state=established,related,untracked >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall nat add action=masquerade chain=srcnat comment="===== MASQUERADE" out-interface-list=ISP >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall raw add action=drop chain=prerouting comment="===== DROP_PORTSCAN" src-address-list=PORTSCAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall raw add action=drop chain=prerouting comment="===== DROP_SRC_BOGONS" src-address-list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall raw add action=drop chain=prerouting comment="===== DROP_DST_BOGONS" dst-address-list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall raw add action=drop chain=prerouting comment="===== DROP_PORTAS_VULNERAVEIS" dst-port=19-25,1900,3389,3390,5353,8291,5900,5900,11211,32595 in-interface-list=ISP protocol=tcp >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall raw add action=drop chain=prerouting comment="===== DROP_PORTAS_VULNERAVEIS_UDP" dst-port=19-25,1900,3389,3390,5353,8291,5900,5900,11211,32595 in-interface-list=ISP protocol=udp >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip service set telnet disabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip service set ftp disabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip service set www disabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip service set ssh disabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip service set api disabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip service set winbox port=%wbport% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip service set api-ssl disabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /routing bfd configuration add disabled=no interfaces=all min-rx=200ms min-tx=200ms multiplier=5 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system clock set time-zone-autodetect=no time-zone-name=America/Sao_Paulo >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system identity set name="%identity%" >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system note set show-at-login=no >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system ntp client set enabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system ntp client servers add address=a.ntp.br >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system ntp client servers add address=b.ntp.br >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system scheduler add interval=4w2d name=backup on-event=backup_semanal policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon start-date=2024-08-09 start-time=22:00:00 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /system script add dont-require-permissions=yes name=backup_semanal policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon source="/export terse show-sensitive file=export\r\ >> "C:\Users\%username%\Desktop\script.rsc"
+@echo     \n/system/backup/save dont-encrypt=yes name=bkp \r\ >> "C:\Users\%username%\Desktop\script.rsc"
+@echo     \n/tool e-mail send to=%destinatarioemail%\\\r\ >> "C:\Users\%username%\Desktop\script.rsc"
+@echo     \n    subject=\"\$[/system identity get name] BACKUP SEMANAL\"\\\r\ >> "C:\Users\%username%\Desktop\script.rsc"
+@echo     \n    body=\"Backup realizado no dia: \$[/system clock get date]\" file=export,bkp" >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /tool bandwidth-server set enabled=no >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /tool e-mail set from=%fromemail% password=%psswemail% port=587 server=smtp.gmail.com tls=starttls user=%useremail% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /tool graphing interface add >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /tool graphing resource add >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /tool mac-server set allowed-interface-list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /tool mac-server mac-winbox set allowed-interface-list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /tool mac-server ping set enabled=no >> "C:\Users\%username%\Desktop\script.rsc"
+
+timeout 10
