@@ -6,20 +6,11 @@ cls
 echo.
 
 ::retirando o ">null" ele mostra os detalhes.
-	echo Digite IP Local da RB.
+	echo Digite IP Local da RB Ex: Para 192.168.0.0/24, digite -- 192.168.0
 		set/p iplocal=
 		
 	echo Digite a mascara do IP Local da RB - ex 24.
 		set/p mask=
-		
-	echo Digite o ip de Network da rede local.
-		set/p network=
-
-	echo Digite o Inicio do Pool da LAN.
-		set/p rangestart=
-
-	echo Digite o Fim do Pool da LAN.
-		set/p rangeend=
 
 	echo Digite a url do servidor da vpn.
 		set/p urlvpn=
@@ -63,7 +54,7 @@ echo.
 @echo /interface list add name=LAN >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /interface lte apn set [ find default=yes ] ip-type=ipv4 use-network-apn=no >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /interface wireless security-profiles set [ find default=yes ] supplicant-identity=MikroTik >> "C:\Users\%username%\Desktop\script.rsc"
-@echo /ip pool add name=pool_local ranges=%rangestart%-%rangeend% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip pool add name=pool_local ranges=%iplocal%.21-%iplocal%.254 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip dhcp-server add address-pool=pool_local interface=bridge-switch lease-time=6h name=dhcp_local >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /port set 0 name=serial0 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /interface sstp-client add authentication=chap,mschap1,mschap2 connect-to=%urlvpn% disabled=no name=sstp-3c-tech password=%senhavpn% port=%portvpn% profile=default-encryption user=%uservpn% >> "C:\Users\%username%\Desktop\script.rsc"
@@ -81,13 +72,13 @@ echo.
 @echo /interface list member add interface=ether5 list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /interface list member add interface=sstp-3c-tech list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /interface ovpn-server server set auth=sha1,md5 >> "C:\Users\%username%\Desktop\script.rsc"
-@echo /ip address add address=%iplocal%/%mask% comment="===== REDE LAN" interface=bridge-switch network=%network% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip address add address=%iplocal%.1/%mask% comment="===== REDE LAN" interface=bridge-switch network=%iplocal%.0 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip cloud set ddns-enabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
 @echo ip dhcp-client add interface=ether1 >> "C:\Users\%username%\Desktop\script.rsc"
-@echo /ip dhcp-server network add address=%iplocal%/%mask% dns-server=8.8.8.8,8.8.4.4 gateway=%iplocal% >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip dhcp-server network add address=%iplocal%.0/%mask% dns-server=8.8.8.8,8.8.4.4 gateway=%iplocal%.1 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip dns set servers=8.8.8.8,8.8.4.4 >> "C:\Users\%username%\Desktop\script.rsc"
-@echo /ip firewall address-list add address=%iplocal%/%mask% comment="===== LAN" list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
-@echo /ip firewall address-list add address=%iplocal%/%mask% comment="===== LOCAL" list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=%iplocal%.0/%mask% comment="===== LAN" list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip firewall address-list add address=%iplocal%.0/%mask% comment="===== LOCAL" list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip firewall address-list add address=172.17.17.0 comment="===== VPN-RJ" list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip firewall address-list add address=10.0.0.0 comment="===== VPN-SP" list=SUPORTE >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip firewall address-list add address=0.0.0.0/8 list=bogons >> "C:\Users\%username%\Desktop\script.rsc"
