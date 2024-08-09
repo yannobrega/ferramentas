@@ -74,7 +74,7 @@ echo.
 @echo /interface ovpn-server server set auth=sha1,md5 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip address add address=%iplocal%.1/%mask% comment="===== REDE LAN" interface=bridge-switch network=%iplocal%.0 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip cloud set ddns-enabled=yes >> "C:\Users\%username%\Desktop\script.rsc"
-@echo ip dhcp-client add interface=ether1 >> "C:\Users\%username%\Desktop\script.rsc"
+@echo /ip dhcp-client add interface=ether1 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip dhcp-server network add address=%iplocal%.0/%mask% dns-server=8.8.8.8,8.8.4.4 gateway=%iplocal%.1 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip dns set servers=8.8.8.8,8.8.4.4 >> "C:\Users\%username%\Desktop\script.rsc"
 @echo /ip firewall address-list add address=%iplocal%.0/%mask% comment="===== LAN" list=LAN >> "C:\Users\%username%\Desktop\script.rsc"
